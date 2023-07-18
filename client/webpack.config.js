@@ -18,10 +18,61 @@ module.exports = () => {
       filename: "[name].bundle.js",
       path: path.resolve(__dirname, "dist"),
     },
-    plugins: [],
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: "./index.html",
+        title: "Text Editor",
+      }),
+      new InjectManifest({
+        swSrc: "./src-sw",
+        swDest: "src-sw.js",
+      }),
+      new WebpackPwaManifest({
+        fingerprints: false,
+        inject: true,
+        name: "Text Editor",
+        short_name: "Text Editor",
+        description: "PWA Text Editor",
+        background_color: "#225ca3",
+        theme_color: "#225ca3",
+        start_url: "/",
+        publicPath: "/",
+        icons: [
+          {
+            src: path.resolve("src/images/logo.png"),
+            sizes: [96, 128, 192, 256, 384, 512], // multiple sizes
+            destination: path.join("assets", "icons"),
+          },
+          {
+            src: path.resolve("./favicon.ico"),
+            size: "48x48",
+            type: "image/ico",
+          },
+        ],
+      }),
+    ],
 
     module: {
-      rules: [],
+      rules: [
+        {
+          test: /\.css$/i,
+          use: ["style-loader", "css-loader"],
+        },
+        {
+          test: /\.m?js$/,
+          exclude: /node_modules/,
+          use: {
+            loader: "babel-loader",
+            options: {
+              presets: ["@babel/preset-env"],
+              plugins: [
+                "@babel/plugin-proposal-object-rest-spread",
+                "@babel/transform-runtime",
+              ],
+            },
+          },
+        },
+      ],
     },
   };
 };
